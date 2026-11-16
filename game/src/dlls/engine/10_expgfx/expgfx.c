@@ -208,6 +208,9 @@ u8 gExpgfxStaticPoolFrameFlags[112] = {
     0, 0, 0, 0, 64, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+Vec3s gExpgfxQuadTemplateA[4] = {{-1000, 0, 1000}, {1000, 0, 1000}, {1000, 0, -1000}, {-1000, 0, -1000}};
+Vec3s gExpgfxQuadTemplateB[4] = {{-1000, -1000, 0}, {1000, -1000, 0}, {1000, 1000, 0}, {-1000, 1000, 0}};
+
 /* Crystal burst amplitude scales + spawn direction table (referenced by objfx.c). */
 ObjFxCrystalBurstTable gObjFxCrystalAmpTbl = {
     {0.5f, 0.55f, 0.65f, 0.7f},
@@ -2286,11 +2289,11 @@ void expgfx_initSlotQuad(void* slotPtr)
     behaviorFlags = slot->behaviorFlags;
     if ((behaviorFlags & EXPGFX_BEHAVIOR_USE_QUAD_TEMPLATE_A) != 0)
     {
-        quadTemplate = staticData->quadTemplateA;
+        quadTemplate = gExpgfxQuadTemplateA;
     }
     else
     {
-        quadTemplate = staticData->quadTemplateB;
+        quadTemplate = gExpgfxQuadTemplateB;
     }
 
     if ((behaviorFlags & EXPGFX_BEHAVIOR_BOUNCE_LOW_Y_VELOCITY) != 0 && slot->velocityY < EXPGFX_Y_VELOCITY_POSITIVE_LIMIT)
@@ -2329,7 +2332,7 @@ void expgfx_initSlotQuad(void* slotPtr)
 
     if (resource == 0)
     {
-        debugPrintf(staticData->noTextureString);
+        debugPrintf("expgfx: no texture\n");
         return;
     }
 
@@ -2576,11 +2579,11 @@ void expgfx_updateActivePools(u8 sourceMode, uintptr_t sourceId, int resetSource
                 }
                 if ((slot->behaviorFlags & EXPGFX_BEHAVIOR_USE_QUAD_TEMPLATE_A) != 0)
                 {
-                    quadTemplate = staticData->quadTemplateA;
+                    quadTemplate = gExpgfxQuadTemplateA;
                 }
                 else
                 {
-                    quadTemplate = staticData->quadTemplateB;
+                    quadTemplate = gExpgfxQuadTemplateB;
                 }
                 if ((slot->behaviorFlags & EXPGFX_BEHAVIOR_COPY_CONFIG_SOURCE_A) != 0 &&
                     (slot->renderFlags & EXPGFX_RENDER_ATTRACT_TARGET_MASK) == 0)
@@ -2931,7 +2934,7 @@ void expgfx_updateActivePools(u8 sourceMode, uintptr_t sourceId, int resetSource
                 quad = (ExpgfxQuadVertex*)slot;
                 if (poolOrResource == 0)
                 {
-                    debugPrintf(staticData->noTextureString);
+                    debugPrintf("expgfx: no texture\n");
                 }
                 else
                 {
@@ -3943,6 +3946,10 @@ void drawGlow(uintptr_t slotPoolBase, int poolIndex)
         slotIndex++;
     } while (slotIndex < EXPGFX_SLOTS_PER_POOL);
 
+    if (zMode == 1)
+    {
+        Camera_ApplyFullViewport();
+    }
     if (gExpgfxRenderResetPending != 0)
     {
         expgfx_updateResourceEntries(0);
@@ -4132,9 +4139,9 @@ void expgfx_resetAllPools(void)
     slotPoolBases[0] = runtime[0]->slotPoolBases;
     poolActiveMasks[0] = runtime[0]->poolActiveMasks;
     poolActiveCounts[0] = runtime[0]->poolActiveCounts;
-    poolSlotTypeIds[0] = staticData->poolSlotTypeIds;
+    poolSlotTypeIds[0] = gExpgfxStaticPoolSlotTypeIds;
     poolSourceIds[0] = runtime[0]->poolSourceIds;
-    poolFrameFlags[0] = staticData->poolFrameFlags;
+    poolFrameFlags[0] = gExpgfxStaticPoolFrameFlags;
 
     while (poolIndex < EXPGFX_POOL_COUNT)
     {
@@ -4164,7 +4171,7 @@ void expgfx_resetAllPools(void)
                 }
                 else
                 {
-                    debugPrintf(staticData->mismatchInAddRemoveString);
+                    debugPrintf("expgfx: mismatch in add/remove\n");
                 }
 
                 slot->sequenceId = EXPGFX_INVALID_SEQUENCE_ID;
