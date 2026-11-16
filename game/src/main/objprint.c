@@ -1419,7 +1419,7 @@ void objRender(int a, int b, int c, int d, GameObject* obj, int flag) {
     doNothing_afterRenderObject();
     for (i = 0; i < (s32)(u32)obj->childCount; i++) {
         GameObject* staff = obj->childObjs[i];
-        if (staff->anim.classId == 0x2d) {
+        if (staff != NULL && staff->anim.classId == 0x2d) {
             staffUpdateSegmentTransforms(staff, obj, (ObjModel*)OBJPRINT_ACTIVE_BANK(staff), a, b, c);
         }
     }

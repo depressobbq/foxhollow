@@ -555,6 +555,9 @@ void TitleScreen_free(GameObject* obj)
  * buffers. */
 void TitleScreen_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible)
 {
+    if (obj->anim.romDefNo == 0x7a7) {
+        return;
+    }
     s32 v = visible;
     if (v == 0)
         return;

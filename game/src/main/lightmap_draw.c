@@ -39,6 +39,7 @@
 #include "main/render_flags.h"
 #include "main/dll/player.h"
 #include "main/dll_000A_expgfx.h"
+#include "main/dll/dll_02C0_front.h"
 #include "foxhollow_config.h"
 
 extern f32 widescreenAspect;
@@ -596,7 +597,9 @@ void sceneDrawTransparentPolys(void)
             mapBlockRenderMain(entries[i].arg0.bounds, entries[i].arg1.block, m);
             break;
         case 7:
-            drawGlow(entries[i].arg0.value, entries[i].arg1.value);
+            if (!isFrontEndUiActive()) {
+                drawGlow(entries[i].arg0.value, entries[i].arg1.value);
+            }
             break;
         case 8:
             waterFxDraw();
