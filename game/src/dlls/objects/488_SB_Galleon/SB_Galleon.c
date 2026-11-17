@@ -598,6 +598,15 @@ void SB_Galleon_updateFlight(GameObject* obj) {
                 obj->anim.localPosX = spawnData->posX;
                 obj->anim.localPosY = -1.0f;
                 obj->anim.localPosZ = spawnData->posZ;
+                obj->anim.worldPosX = spawnData->posX;
+                obj->anim.worldPosY = -1.0f;
+                obj->anim.worldPosZ = spawnData->posZ;
+                ObjHits_EnableObject(obj);
+                if (obj->anim.hitboxTransformState != NULL) {
+                    obj->anim.hitboxTransformState->resetFrames = 0;
+                    ObjHitbox_UpdateRotatedBounds((ObjHitbox*)obj, 1);
+                    ObjHitbox_UpdateRotatedBounds((ObjHitbox*)obj, 1);
+                }
                 Sfx_StopObjectChannel(obj, 1);
                 (*gMapEventInterface)->setObjGroupStatus(obj->anim.hostedMapSlot, 2, 1);
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
@@ -706,6 +715,13 @@ void SB_Galleon_updateShield(GameObject* obj) {
 
     state = obj->extra;
     obj->userData1 = 7;
+
+    ObjHits_EnableObject(obj);
+    if (obj->anim.hitboxTransformState != NULL) {
+        obj->anim.hitboxTransformState->resetFrames = 0;
+        obj->anim.hitboxTransformState->pad10E = 0;
+        ObjHitbox_UpdateRotatedBounds((ObjHitbox*)obj, 1);
+    }
 
     if (mainGetBit(DBPROTECTION_GAMEBIT_TRANSITION_ARMED) != 0 &&
         mainGetBit(DBPROTECTION_GAMEBIT_TRANSITION_USED) == 0 && mainGetBit(GAMEBIT_ITEM_WMGoldKey_Got) != 0) {

@@ -1017,24 +1017,14 @@ void ObjHits_SortSweepEntries(ObjHitsSweepEntry** sweepPtrs, int entryCount) {
 }
 
 void ObjHits_TickPriorityHitCooldowns(void) {
-    int slotOffset;
-    short slotIndex;
-    u8* base;
-    ObjHitsPriorityWorkSlot* workSlot;
+    int slotIndex;
 
-    slotIndex = 0;
-    slotOffset = 0;
-    do {
-        base = (u8*)gObjHitsPriorityHitStates;
-        workSlot = (ObjHitsPriorityWorkSlot*)(base + slotOffset);
-        if (workSlot->active != 0) {
-            workSlot->active--;
+    for (slotIndex = 0; slotIndex < OBJHITS_PRIORITY_WORK_SLOT_COUNT; slotIndex++) {
+        if (gObjHitsPriorityHitStates[slotIndex].active != 0) {
+            gObjHitsPriorityHitStates[slotIndex].active--;
         }
-        slotOffset = slotOffset + OBJHITS_PRIORITY_WORK_SLOT_SIZE;
-        slotIndex++;
-    } while (slotIndex < OBJHITS_PRIORITY_WORK_SLOT_COUNT);
+    }
     gObjHitsPriorityHitTickDelta = timeDelta;
-    return;
 }
 
 void ObjHitbox_UpdateRotatedBounds(ObjHitbox* hitbox, int advanceMatrix) {
@@ -2852,7 +2842,7 @@ void ObjHits_RefreshObjectState(GameObject* object) {
         if ((hitState->shapeFlags & OBJHITS_SHAPE_SKELETON) != 0) {
             activeModel = ObjAnim_GetActiveModel(obj);
             if (((activeModel->file->flags & OBJANIM_DEF_FLAG_SKELETON_HITBOXES) == 0) ||
-                (*(void**)(((int*)activeModel) + 5) == 0)) {
+                (activeModel->jointWorkspace == NULL)) {
                 hitState->shapeFlags &= ~OBJHITS_SHAPE_SKELETON;
             }
         }

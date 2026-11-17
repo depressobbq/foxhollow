@@ -1668,7 +1668,7 @@ int trackGetHeight(GameObject* obj, f32 x, f32 y, f32 z, TrackGroundHit*** hitsO
             break;
         }
         if (desc->object != NULL) {
-            Matrix_TransformPoint(desc->currentMatrix, x, 0.0f, z, &tx, &ty, &tz);
+            Matrix_TransformPoint(desc->currentMatrix, x, y, z, &tx, &ty, &tz);
             trackCollectGroundHits(gTrackTriangleBuffer + desc->firstTriangle,
                                    gTrackTriangleBuffer + desc[1].firstTriangle, desc, tx, tz, mode);
         } else {
@@ -2641,25 +2641,20 @@ TrackTriangle* trackBuildBlockTriangles(TrackTriangle* cur, int x0, int y0, int 
     f32 edges[3][3];
     f32 vertices[3][3];
     f32 en[3];
-    uintptr_t offA;
     int* firstp;
-    int last;
     int mask16;
     int f40, f80, f200, f120, f20, f8, f100, f4;
     int gx0, gz0, gx1, gz1;
-    uintptr_t offB;
     MapBlockData **cellp, **cw;
     int gx, gz;
     int count, layer;
     int *descp, *dw;
-    uintptr_t offC;
     int relx0, relz0, relx1, relz1;
     int i;
     int vEnd;
     u8* triEnd;
     u8 typeb;
     uintptr_t bb;
-    u32 dmaflip;
     MapBlockData** p1;
     int* q1;
     MapBlockData** p2;
@@ -2715,14 +2710,6 @@ TrackTriangle* trackBuildBlockTriangles(TrackTriangle* cur, int x0, int y0, int 
         return cur;
     }
 
-    {
-        MapBlockData* c0 = cells[0];
-        void* p = mapBlockGetPolygon(c0, 0);
-        dmaflip = 0;
-        offA = 0;
-        cacheAllocAndCopy((u8*)p, c0->nPolygons << 3, &offA, &offB, 0x2000);
-        cacheAllocAndCopy((u8*)c0->vertices, c0->vertexCount * 6, &offB, &offC, 0x2000);
-    }
     i = 0;
     firstp = (int*)gTrackGridOrigin;
     f40 = (u16)flags & 0x40;
@@ -2733,7 +2720,6 @@ TrackTriangle* trackBuildBlockTriangles(TrackTriangle* cur, int x0, int y0, int 
     f8 = (u16)flags & 8;
     f100 = (u16)flags & 0x100;
     f4 = (u16)flags & 4;
-    last = count - 1;
     for (; i < count; i++) {
         MapBlockData* blk;
         uintptr_t vb;
@@ -2744,25 +2730,9 @@ TrackTriangle* trackBuildBlockTriangles(TrackTriangle* cur, int x0, int y0, int 
         int dxoff, dzoff;
         u8* tri0;
 
-        bb = offA;
-        vb = offB;
-        if (i < last) {
-            MapBlockData* next = cellp[1];
-            u32 nextBase;
-            void* p;
-            int c13, c14;
-            dmaflip ^= 0x2000;
-            nextBase = dmaflip + 0x2000;
-            p = mapBlockGetPolygon(next, 0);
-            offA = dmaflip;
-            c13 = cacheAllocAndCopy((u8*)p, next->nPolygons << 3, &offA, &offB, nextBase);
-            c14 = cacheAllocAndCopy((u8*)next->vertices, next->vertexCount * 6, &offB, &offC, nextBase);
-            cacheQueueWait((u8)(c13 + c14));
-        } else {
-            cacheQueueWait(0);
-        }
-
         blk = *cellp;
+        bb = (uintptr_t)mapBlockGetPolygon(blk, 0);
+        vb = (uintptr_t)blk->vertices;
         relx0 = x0 - descp[0];
         relx1 = x1 - descp[0];
         relz0 = z0 - descp[2];
@@ -3053,7 +3023,7 @@ void trackIntersectBroadphase(GameObject* obj, TrackQueryBounds* ranges, u32 que
         } else {
             cur = trackBuildBlockTriangles(gTrackTriangleBuffer, x0, y0, z0, x1, y1, z1, queryMask, b);
         }
-        if (cur < gTrackTriangleBufferEnd && (masked & 1) && obj != NULL) {
+        if (cur < gTrackTriangleBufferEnd && ((masked & 1) || (obj != NULL && obj->anim.parent != NULL)) && obj != NULL) {
             ObjAnimComponent** t = ObjHitReact_GetResetObjects(&count);
             i = 0;
             resetObjects = t;

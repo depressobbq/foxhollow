@@ -2699,7 +2699,7 @@ void* loadAndDecompressDataFile(int fileId, void* destBuf, int offsetFlags, u32 
             while (intr = OSDisableInterrupts(), entryIndex = gAssetLoadInFlightFlags, OSRestoreInterrupts(intr),
                    entryIndex != 0) {
                 if ((entryIndex & 0x20000000) == 0 && (entryIndex & 0x10000000) == 0) {
-                    tab0 = *(u32*)((char*)&gResourceFileBuffers[0] + 0x80000000);
+                    tab0 = (uintptr_t)MLDF_PTR(0xe);
                     break;
                 }
                 padUpdate();

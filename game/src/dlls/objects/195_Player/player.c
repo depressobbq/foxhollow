@@ -15380,7 +15380,10 @@ void playerDoHitDetection(GameObject* obj) {
                 Obj_SetParent(obj, (GameObject*)h, 1);
             }
         } else if (obj->anim.parent != NULL) {
-            Obj_SetParent(obj, NULL, 1);
+            if (obj->anim.parent != (GameObject*)getSbGalleon() &&
+                obj->anim.parent->anim.romDefNo != 0x8E) {
+                Obj_SetParent(obj, NULL, 1);
+            }
         }
     }
 

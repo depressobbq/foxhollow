@@ -1159,35 +1159,18 @@ void voxmaps_updateTimers(void) {
 }
 
 void voxmaps_resetLoadedMaps(void) {
-    void** mapBuffer[1];
-    int* blockId[1];
-    int* timer[1];
-    u8* slotInUse[1];
-    VoxMapSlotOrigin* slotOrigin[1];
     int i;
 
-    mapBuffer[0] = 0;
-    blockId[0] = 0;
-    timer[0] = 0;
-    slotInUse[0] = 0;
-    slotOrigin[0] = gVoxMaps.slotOrigin;
-    for (i = 0, mapBuffer[0] = (void**)(slotOrigin[0] + 23), blockId[0] = (int*)(slotOrigin[0] + 12),
-        timer[0] = (int*)(slotOrigin[0] + 6), slotInUse[0] = gVoxMapsSlotInUse;
-         i < VOXMAP_SLOT_COUNT; i++) {
-        if (*mapBuffer[0] != NULL) {
-            mm_free(*mapBuffer[0]);
-            *mapBuffer[0] = NULL;
+    for (i = 0; i < VOXMAP_SLOT_COUNT; i++) {
+        if (gVoxMaps.mapBuffer[i] != NULL) {
+            mm_free(gVoxMaps.mapBuffer[i]);
+            gVoxMaps.mapBuffer[i] = NULL;
         }
-        *blockId[0] = -2;
-        *timer[0] = 0x40000000;
-        *slotInUse[0] = 0;
-        slotOrigin[0]->gridX = 0;
-        slotOrigin[0]->gridZ = 0;
-        mapBuffer[0]++;
-        blockId[0]++;
-        timer[0]++;
-        slotInUse[0]++;
-        slotOrigin[0]++;
+        gVoxMaps.blockId[i] = -2;
+        gVoxMaps.timer[i] = 0x40000000;
+        gVoxMapsSlotInUse[i] = 0;
+        gVoxMaps.slotOrigin[i].gridX = 0;
+        gVoxMaps.slotOrigin[i].gridZ = 0;
     }
 }
 

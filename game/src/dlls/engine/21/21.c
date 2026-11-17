@@ -1325,7 +1325,7 @@ void curves_gatherTrackTriangles(GameObject* obj, CurvesCollisionState* state)
     type = state->subtype;
     if (type == CURVES_COLLISION_SUBTYPE_OBJECT || type == CURVES_COLLISION_SUBTYPE_POINT)
     {
-        if ((s32)(flags & 0x00000004) != 0)
+        if ((s32)(flags & 0x00000004) != 0 || (obj != NULL && obj->anim.parent != NULL))
             mask |= 0x1;
         if ((s32)(flags & 0x01000000) != 0)
             mask |= 0x20;
