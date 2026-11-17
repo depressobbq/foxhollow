@@ -1,0 +1,8 @@
+CompileFlags:
+  CompilationDatabase: build
+  Add:
+    - -Wno-everything
+
+Diagnostics:
+  Suppress:
+    - unused-command-line-argument

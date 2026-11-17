@@ -214,6 +214,7 @@ if (TARGET game)
             aurora::core aurora::gx aurora::main aurora::vi
             aurora::os aurora::pad aurora::dvd aurora::card
             aurora::mtx aurora::si aurora::gd aurora::ms aurora::thp)
+    target_include_directories(linkcheck PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/port/include)
     foxhollow_link_whole_archive(linkcheck game)
     add_dependencies(linkcheck game)
     set_target_properties(linkcheck PROPERTIES LINK_DEPENDS $<TARGET_FILE:game>)
